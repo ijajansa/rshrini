@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Subject extends Model
 {
     protected $fillable = [
-    	'name','image','standard_id','medium_id'
+    	'name','image','standard_id','medium_id','type','is_active'
     ];
     
     public function chapters()

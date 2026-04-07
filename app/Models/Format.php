@@ -8,4 +8,11 @@ use Illuminate\Database\Eloquent\Model;
 class Format extends Model
 {
     use HasFactory;
+
+    protected $fillable = [
+        'chapter_id',
+        'link',
+        'type',
+        'is_active',
+    ];
 }
