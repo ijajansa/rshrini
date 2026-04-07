@@ -9,9 +9,11 @@ class Question extends Model
 {
     protected $fillable = [
 		'chapter_id',
+		'question_type',
 		'question_text',
 		'question_image',
 		'solution',
+		'solution_type',
 		'solution_text',
 		'solution_image',
 		'option1',
@@ -25,7 +27,8 @@ class Question extends Model
 		'option3_type',
 		'option4',
 		'option4_image',
-		'option4_type'
+		'option4_type',
+		'is_active'
 	]; 
 	
     public function options()
