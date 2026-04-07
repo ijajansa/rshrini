@@ -96,6 +96,17 @@
 </ul>
 </li>
 
+<li class="{{ request()->is('mcq-questions/*') ? 'mm-active' : '' }}">
+    <a class="has-arrow {{ request()->is('mcq-questions/*') ? 'mm-active' : '' }}" href="javascript:void(0);" aria-expanded="{{ request()->is('mcq-questions/*') ? 'true' : 'false' }}">
+        <i class="material-icons">quiz</i>
+        <span class="nav-text">MCQ Questions</span>
+    </a>
+    <ul aria-expanded="{{ request()->is('mcq-questions/*') ? 'true' : 'false' }}" class="{{ request()->is('mcq-questions/*') ? 'mm-show' : '' }}">
+        <li><a class="{{ request()->is('mcq-questions/all') || request()->is('mcq-questions/view/*') || request()->is('mcq-questions/edit/*') ? 'mm-active' : '' }}" href="{{url('mcq-questions/all')}}">All Questions</a></li>
+        <li><a class="{{ request()->is('mcq-questions/add') ? 'mm-active' : '' }}" href="{{url('mcq-questions/add')}}">Add New Question</a></li>
+    </ul>
+</li>
+
 
 </ul>
 
