@@ -12,7 +12,11 @@ use App\Services\ChapterService;
 use App\Services\BookmarkService;
 use App\Http\Requests\RegisterRequest;
 use App\Http\Requests\UpdateProfileRequest;
+use App\Http\Requests\UpdatePasswordRequest;
 use App\Http\Requests\ChapterRequest;
+use App\Http\Requests\ChapterFormatRequest;
+use App\Http\Requests\MediumRequest;
+use App\Http\Requests\SubjectRequest;
 use Tymon\JWTAuth\Exceptions\JWTException;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use Auth;
@@ -51,6 +55,14 @@ class AuthController extends Controller
 
 	public function login(Request $request)
 	{
+		if(!$request->contact_number || !$request->password)
+		{
+			return response()->json([
+				'status' => false,
+				'message' => 'Contact number and password are required.',
+			]);
+		}
+
 		$user_data = $request->all();
 		$check_user = $this->UserService->checkIsUserExists($user_data);
 		if(!$check_user)
@@ -68,7 +80,7 @@ class AuthController extends Controller
 			]);	
 		}
 
-		$credentials = $request->only('email', 'password');
+		$credentials = $request->only('contact_number', 'password');
 		//Create token
 		try {
 			if(!$token=JWTAuth::attempt($credentials)){
@@ -113,7 +125,7 @@ class AuthController extends Controller
 		}
 	}
 	
-	public function getSubjectData(Request $request)
+	public function getSubjectData(SubjectRequest $request)
 	{
 
 	    $medium_id = $request->medium_id ?? 0;
@@ -137,7 +149,7 @@ class AuthController extends Controller
 	}
 	
 	
-	public function getMediumData(Request $request)
+	public function getMediumData(MediumRequest $request)
 	{
 	    
 	    $standard_id = $request->standard_id ?? 0;
@@ -204,6 +216,14 @@ class AuthController extends Controller
 	public function updateProfile(UpdateProfileRequest $request)
 	{
 	    $data = $request->all();
+	    if($request->hasFile('profile_photo'))
+	    {
+	    	$data['profile_photo'] = $request->file('profile_photo');
+	    }
+	    else
+	    {
+	    	unset($data['profile_photo']);
+	    }
 	    $data['id']=$request->user()->id ?? 0;
 	    $response = $this->UserService->updateUser($data);
 		if($response)
@@ -244,7 +264,7 @@ class AuthController extends Controller
 		}
 	}
 	
-	public function updateProfilePassword(Request $request)
+	public function updateProfilePassword(UpdatePasswordRequest $request)
 	{
 	    $data = $request->all();
 	    $data['id']=$request->user()->id ?? 0;
@@ -392,7 +412,7 @@ class AuthController extends Controller
 		}	
 	}
 	
-	public function getChapterFormatData(Request $request)
+	public function getChapterFormatData(ChapterFormatRequest $request)
 	{
 		$data = $request->all();
 		$response = $this->ChapterService->fetchChapterFormats($data);

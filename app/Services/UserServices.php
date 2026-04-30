@@ -13,7 +13,7 @@ class UserServices
 
     public function checkIsUserExists(array $data = [])
     {
-    	return $this->UserModel->where('email',$data['email'])->first();
+    	return $this->UserModel->where('contact_number',$data['contact_number'])->first();
     }
 
     public function createUser(array $data = [])

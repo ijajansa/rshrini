@@ -6,9 +6,8 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Validation\Rule;
 
-class UpdateProfileRequest extends FormRequest
+class MediumRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -28,24 +27,7 @@ class UpdateProfileRequest extends FormRequest
     public function rules(): ?array
     {
         return [
-            'name' => 'required|max:50',
-            'address' => 'required',
-            'gender' => 'required|max:20',
-            'contact_number' => [
-                            'required',
-                            'numeric',
-                            'digits:10',
-                            Rule::unique('users', 'contact_number')->ignore($this->user()->id),
-                        ],
-            'parent_contact_number' => 'required|numeric|digits:10',
-            'email' => [
-                            'required',
-                            'email',
-                            Rule::unique('users', 'email')->ignore($this->user()->id),
-                        ],
-            'profile_photo' => $this->hasFile('profile_photo')
-                            ? 'file|mimes:png,jpg,jpeg|max:1024'
-                            : 'nullable',
+            'standard_id' => 'required|integer|exists:standards,id',
         ];
     }
 
