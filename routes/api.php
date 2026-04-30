@@ -19,14 +19,14 @@ Route::post('login', [AuthController::class, 'login']);
 Route::post('register', [AuthController::class, 'register']);
 Route::group(['middleware' => ['jwt.verify']], function(){
 	Route::post('dashboard', [AuthController::class, 'dashboard']);
-	Route::get('standards', [AuthController::class, 'getStandardData']);
+	Route::post('standards', [AuthController::class, 'getStandardData']);
 	Route::post('mediums', [AuthController::class, 'getMediumData']);
 	Route::post('subjects', [AuthController::class, 'getSubjectData']);
 	Route::get('pdf-types', [AuthController::class, 'getChapterTypeData']);
 	Route::post('chapters', [AuthController::class, 'getChapterData']);
 	Route::post('chapter-formats', [AuthController::class, 'getChapterFormatData']);
 	Route::post('update-profile', [AuthController::class, 'updateProfile']);
-	Route::get('get-profile', [AuthController::class, 'getProfile']);
+	Route::post('get-profile', [AuthController::class, 'getProfile']);
 	Route::post('update-password', [AuthController::class, 'updateProfilePassword']);
 	Route::post('get-questions', [AuthController::class, 'getQuestions']);
 	Route::post('submit-answers', [AuthController::class, 'submitAnswers']);
