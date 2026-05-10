@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Standard;
+use Illuminate\Validation\Rule;
 use Auth;
 use DataTables;
 
@@ -26,8 +27,18 @@ class StandardController extends Controller
 
 	public function addStandard(Request $request)
 	{
+		$request->merge([
+			'name' => trim((string) $request->input('name', '')),
+			'other_name' => $request->filled('other_name') ? trim((string) $request->input('other_name')) : null,
+		]);
+
 		$request->validate([
-			'name'=>'required',
+			'name'=>[
+				'required',
+				Rule::unique('standards', 'name')->where(function ($query) {
+					return $query->whereIn('is_active', [0, 1]);
+				}),
+			],
 			'other_name'=>'nullable'
 		]);
 
@@ -63,8 +74,18 @@ class StandardController extends Controller
 
 	public function postUpdateStandard(Request $request,$id)
 	{
+		$request->merge([
+			'name' => trim((string) $request->input('name', '')),
+			'other_name' => $request->filled('other_name') ? trim((string) $request->input('other_name')) : null,
+		]);
+
 		$request->validate([
-			'name'=>'required',
+			'name'=>[
+				'required',
+				Rule::unique('standards', 'name')->ignore($id)->where(function ($query) {
+					return $query->whereIn('is_active', [0, 1]);
+				}),
+			],
 			'other_name'=>'nullable'
 		]);
 		$data = Standard::find($id);

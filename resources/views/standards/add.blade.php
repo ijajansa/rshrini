@@ -29,7 +29,7 @@
 								<div class="mb-3">
 									<label for="exampleFormControlInput1" class="form-label text-primary">Other Name</label>
 									<input type="text" class="form-control form-control-sm @error('other_name') is-invalid @enderror" id="exampleFormControlInput1" value="{{old('other_name')}}" placeholder="e.g. XI" name="other_name">
-									@error('name')
+									@error('other_name')
 									<span class="invalid-feedback" role="alert">
 										<strong>{{ $message }}</strong>
 									</span>

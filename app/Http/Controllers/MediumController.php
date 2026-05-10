@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Standard;
 use App\Models\Medium;
+use Illuminate\Validation\Rule;
 use Auth;
 use DataTables;
 
@@ -28,9 +29,19 @@ class MediumController extends Controller
 
 	public function addMedium(Request $request)
 	{
+		$request->merge([
+			'name' => trim((string) $request->input('name', '')),
+		]);
+
 		$request->validate([
-			'name'=>'required',
-			'standard_id'=>'required'
+			'name'=>[
+				'required',
+				Rule::unique('media', 'name')->where(function ($query) use ($request) {
+					return $query->where('standard_id', $request->standard_id)
+						->whereIn('is_active', [0, 1]);
+				}),
+			],
+			'standard_id'=>'required|integer|exists:standards,id'
 		]);
 
 		$new = new Medium();
@@ -67,9 +78,19 @@ class MediumController extends Controller
 
 	public function postUpdateMedium(Request $request,$id)
 	{
+		$request->merge([
+			'name' => trim((string) $request->input('name', '')),
+		]);
+
 		$request->validate([
-			'name'=>'required',
-			'standard_id'=>'required'
+			'name'=>[
+				'required',
+				Rule::unique('media', 'name')->ignore($id)->where(function ($query) use ($request) {
+					return $query->where('standard_id', $request->standard_id)
+						->whereIn('is_active', [0, 1]);
+				}),
+			],
+			'standard_id'=>'required|integer|exists:standards,id'
 		]);
 		$data = Medium::find($id);
 		if($data)

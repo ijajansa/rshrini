@@ -52,10 +52,24 @@ class SubjectController extends Controller
 
     public function addSubject(Request $request)
     {
+        $request->merge([
+            'name' => trim((string) $request->input('name', '')),
+        ]);
+
+        $medium = Medium::find($request->standard_id);
+
     	$request->validate([
-    		'name' => 'required|regex:/^[\pL\s\-]+$/u',
+    		'name' => [
+                'required',
+                'regex:/^[\pL\s\-]+$/u',
+                Rule::unique('subjects', 'name')->where(function ($query) use ($request, $medium) {
+                    return $query->where('standard_id', $medium->standard_id ?? 0)
+                        ->where('medium_id', $request->standard_id)
+                        ->whereIn('is_active', [0, 1]);
+                }),
+            ],
     		'image' => 'required|mimes:jpg,png,svg,jpeg',
-    		'standard_id' => 'required',
+    		'standard_id' => 'required|integer|exists:media,id',
     	]);
 
     	$record = $request->all();
@@ -105,16 +119,30 @@ class SubjectController extends Controller
     	return redirect()->back('error','Subject details not found');
     }
 
-    public function postUpdateSubject(Request $request)
+    public function postUpdateSubject(Request $request,$id)
     {
+        $request->merge([
+            'name' => trim((string) $request->input('name', '')),
+        ]);
+
+        $medium = Medium::find($request->standard_id);
+
     	$request->validate([
-    		'name' => 'required|regex:/^[\pL\s\-]+$/u',
+    		'name' => [
+                'required',
+                'regex:/^[\pL\s\-]+$/u',
+                Rule::unique('subjects', 'name')->ignore($id)->where(function ($query) use ($request, $medium) {
+                    return $query->where('standard_id', $medium->standard_id ?? 0)
+                        ->where('medium_id', $request->standard_id)
+                        ->whereIn('is_active', [0, 1]);
+                }),
+            ],
     		'image' => 'nullable|mimes:jpg,png,svg,jpeg',
-    		'standard_id' => 'required',
+    		'standard_id' => 'required|integer|exists:media,id',
     	]);
 
     	$record = $request->all();
-    	$record['id'] = $request->id ?? 0;
+    	$record['id'] = $id;
         unset($record['_token']);
         $response = $this->SubjectService->update($record);
         if($response)
