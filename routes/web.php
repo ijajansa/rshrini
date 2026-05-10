@@ -97,7 +97,7 @@ Route::group(['prefix' => 'chapters', 'middleware'=> ['auth']], function(){
 	Route::post('add',[ChapterController::class, 'addChapterFormat']);
 	Route::get('edit/{id}',[ChapterController::class, 'editChapterFormatPage']);
 	Route::post('edit/{id}',[ChapterController::class, 'postUpdateChapterFormat']);
-	Route::get('status/{id}',[ChapterController::class, 'changeStatus']);
+	Route::get('status/{id}',[ChapterController::class, 'changeFormatStatus']);
 });
 
 });

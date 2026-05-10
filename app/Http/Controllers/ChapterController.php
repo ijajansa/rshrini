@@ -47,9 +47,13 @@ class ChapterController extends Controller
 
     public function addChapter(Request $request)
     {
+        $request->merge([
+            'name' => trim((string) $request->input('name', '')),
+        ]);
+
     	$request->validate([
     		'name' => 'required|regex:/^[\pL\s\-]+$/u',
-    		'subject_id' => 'required'
+    		'subject_id' => 'required|integer|exists:subjects,id'
     	]);
 
     	$record = $request->all();
@@ -101,15 +105,19 @@ class ChapterController extends Controller
     	return redirect()->back('error','Chapter details not found');
     }
 
-    public function postUpdateChapter(Request $request)
+    public function postUpdateChapter(Request $request,$id)
     {
+        $request->merge([
+            'name' => trim((string) $request->input('name', '')),
+        ]);
+
     	$request->validate([
     		'name' => 'required|regex:/^[\pL\s\-]+$/u',
-    		'subject_id' => 'required',
+    		'subject_id' => 'required|integer|exists:subjects,id',
     	]);
 
     	$record = $request->all();
-    	$record['id'] = $request->id ?? 0;
+    	$record['id'] = $id;
         unset($record['_token']);
         $response = $this->ChapterService->update($record);
         if($response)
@@ -177,6 +185,11 @@ class ChapterController extends Controller
 
     public function addChapterFormat(Request $request)
     {
+        $request->validate([
+            'chapter_id' => 'required|integer|exists:chapters,id',
+            'type' => 'required|in:video,audio,pdf',
+        ]);
+
         if($request->type == 'video')
         {
             $request->validate([
@@ -226,8 +239,12 @@ class ChapterController extends Controller
 
     }
 
-    public function postUpdateChapterFormat(Request $request)
+    public function postUpdateChapterFormat(Request $request,$id)
     {
+        $request->validate([
+            'chapter_id' => 'required|integer|exists:chapters,id',
+        ]);
+
         if($request->type == 1)
         {
             $request->validate([
@@ -247,7 +264,7 @@ class ChapterController extends Controller
             ]);
         }  
 
-        $record = Format::find($request->id);
+        $record = Format::find($id);
         if($record)
         {
             $record->chapter_id = $request->chapter_id ?? 0;
@@ -278,6 +295,28 @@ class ChapterController extends Controller
             return redirect()->back()->with('error','Something went wrong');
 
 
+    }
+
+    public function changeFormatStatus($id)
+    {
+        $record = Format::find($id);
+        if($record && $record->is_active == 1)
+        {
+            $record->is_active = 0;
+            $record->save();
+        }
+        else if($record)
+        {
+            $record->is_active = 1;
+            $record->save();
+        }
+
+        if($record)
+        {
+            return redirect()->back()->with('success','Chapter format status changed successfully');
+        }
+
+        return redirect()->back()->with('error','Unable to change chapter format status');
     }
 
 }
