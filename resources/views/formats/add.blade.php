@@ -33,9 +33,25 @@
 								<div class="mb-3">
 								    
 								    <label for="fileInput" class="form-label">Upload File <span class="required">*</span></label>
-									<input type="file" class="form-control form-control-sm @error('file') is-invalid @enderror" id="fileInput" name="file">
+									@php
+										$fileType = request()->get('format');
+										$acceptAttr = '';
+										$helpText = '';
+										if($fileType == 'video') {
+											$acceptAttr = 'accept="video/mp4,video/x-msvideo,video/quicktime,video/x-ms-asf,video/x-flv,.mp4,.avi,.mov,.wmv,.flv,.webm"';
+											$helpText = 'Accepted formats: MP4, AVI, MOV, WMV, FLV, WEBM (Max 500MB)';
+										} elseif($fileType == 'audio') {
+											$acceptAttr = 'accept="audio/mpeg,audio/wav,audio/x-wav,.mp3,.wav,.m4a"';
+											$helpText = 'Accepted formats: MP3, WAV, M4A (Max 300MB)';
+										} else {
+											$acceptAttr = 'accept=".pdf,application/pdf"';
+											$helpText = 'Accepted format: PDF (Max 200MB)';
+										}
+									@endphp
+									<input type="file" class="form-control form-control-sm @error('file') is-invalid @enderror" id="fileInput" name="file" {!! $acceptAttr !!}>
+									<small class="form-text text-muted d-block mt-1">{{ $helpText }}</small>
 									@error('file')
-										<span class="invalid-feedback" role="alert">
+										<span class="invalid-feedback d-block" role="alert">
 											<strong>{{ $message }}</strong>
 										</span>
 									@enderror

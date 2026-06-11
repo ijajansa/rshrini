@@ -25,6 +25,19 @@ function initializeFileUpload() {
     if (fileInput) {
         fileInput.addEventListener('change', function() {
             alertContainer.innerHTML = '';
+            
+            // Validate file type
+            if (this.files[0]) {
+                const file = this.files[0];
+                const fileType = document.querySelector('input[name="type"]').value;
+                const validationResult = validateFileType(file, fileType);
+                
+                if (!validationResult.valid) {
+                    showAlert(validationResult.message, 'danger');
+                    this.value = ''; // Clear the file input
+                    return false;
+                }
+            }
         });
     }
 
@@ -52,6 +65,16 @@ function initializeFileUpload() {
         e.preventDefault();
         console.log('✓ File selected, doing AJAX upload');
 
+        // Validate file type
+        const fileTypeInput = document.querySelector('input[name="type"]');
+        const fileType = fileTypeInput ? fileTypeInput.value : 'video';
+        const validationResult = validateFileType(file, fileType);
+        
+        if (!validationResult.valid) {
+            showAlert(validationResult.message, 'danger');
+            return false;
+        }
+
         // Check file size
         const maxSizes = {
             'video': 536870912,   // 512MB
@@ -59,8 +82,6 @@ function initializeFileUpload() {
             'pdf': 214958080      // 205MB
         };
 
-        const fileTypeInput = document.querySelector('input[name="type"]');
-        const fileType = fileTypeInput ? fileTypeInput.value : 'video';
         const maxSize = maxSizes[fileType] || 536870912;
 
         if (file.size > maxSize) {
@@ -194,6 +215,72 @@ function initializeFileUpload() {
         xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
         xhr.send(formData);
     });
+}
+
+/**
+ * Validate file type based on format type
+ */
+function validateFileType(file, fileType) {
+    // MIME types for each format
+    const validTypes = {
+        'video': [
+            'video/mp4',
+            'video/x-msvideo',
+            'video/quicktime',
+            'video/x-ms-asf',
+            'video/x-flv',
+            'video/webm',
+            'video/x-ms-wmv',
+            'video/mpeg',
+            'video/3gpp'
+        ],
+        'audio': [
+            'audio/mpeg',
+            'audio/wav',
+            'audio/x-wav',
+            'audio/mp3',
+            'audio/x-mp3',
+            'audio/x-mpeg',
+            'audio/m4a'
+        ],
+        'pdf': [
+            'application/pdf'
+        ]
+    };
+
+    // File extensions as backup
+    const validExtensions = {
+        'video': ['mp4', 'avi', 'mov', 'wmv', 'flv', 'webm', 'mkv', 'mpg', 'mpeg', '3gp'],
+        'audio': ['mp3', 'wav', 'm4a', 'flac', 'aac', 'ogg', 'wma'],
+        'pdf': ['pdf']
+    };
+
+    const typeNames = {
+        'video': 'Video',
+        'audio': 'Audio',
+        'pdf': 'PDF'
+    };
+
+    const allowed = validTypes[fileType] || [];
+    const allowedExts = validExtensions[fileType] || [];
+    const fileName = file.name.toLowerCase();
+    const fileExt = fileName.split('.').pop();
+    const mimeType = file.type.toLowerCase();
+
+    // Check MIME type or extension
+    const mimeValid = allowed.some(type => mimeType.includes(type.split('/')[0]) || mimeType === type);
+    const extValid = allowedExts.includes(fileExt);
+
+    if (!mimeValid && !extValid) {
+        const formatName = typeNames[fileType] || 'file';
+        const extList = allowedExts.join(', ').toUpperCase();
+        return {
+            valid: false,
+            message: `Invalid file type! Please upload a ${formatName} file (${extList})`
+        };
+    }
+
+    return { valid: true, message: '' };
 }
 
 /**
