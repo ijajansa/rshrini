@@ -98,7 +98,7 @@ function initializeFileUpload() {
         const formData = new FormData();
         formData.append('_token', token);
         formData.append('chapter_id', chapter);
-        formData.append('type', fileType);
+        formData.append('type', fileType); // Send original type (numeric for edit, string for add)
         formData.append('file', file);
 
         // Show progress section and disable submit button
@@ -218,9 +218,27 @@ function initializeFileUpload() {
 }
 
 /**
+ * Convert numeric type to string type
+ */
+function convertTypeToString(typeValue) {
+    const typeMap = {
+        '0': 'audio',
+        '1': 'video',
+        '2': 'pdf',
+        'audio': 'audio',
+        'video': 'video',
+        'pdf': 'pdf'
+    };
+    return typeMap[String(typeValue)] || 'video';
+}
+
+/**
  * Validate file type based on format type
  */
 function validateFileType(file, fileType) {
+    // Convert numeric type to string
+    fileType = convertTypeToString(fileType);
+    
     // MIME types for each format
     const validTypes = {
         'video': [
@@ -266,6 +284,8 @@ function validateFileType(file, fileType) {
     const fileName = file.name.toLowerCase();
     const fileExt = fileName.split('.').pop();
     const mimeType = file.type.toLowerCase();
+
+    console.log('Validating file:', fileName, 'Type:', fileType, 'MIME:', mimeType, 'Ext:', fileExt);
 
     // Check MIME type or extension
     const mimeValid = allowed.some(type => mimeType.includes(type.split('/')[0]) || mimeType === type);
