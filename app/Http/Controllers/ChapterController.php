@@ -193,19 +193,19 @@ class ChapterController extends Controller
         if($request->type == 'video')
         {
             $request->validate([
-                'file' => 'required|mimetypes:video/x-ms-asf,video/x-flv,video/mp4,application/x-mpegURL,video/MP2T,video/3gpp,video/quicktime,video/x-msvideo,video/x-ms-wmv,video/avi'
+                'file' => 'required|mimetypes:video/x-ms-asf,video/x-flv,video/mp4,application/x-mpegURL,video/MP2T,video/3gpp,video/quicktime,video/x-msvideo,video/x-ms-wmv,video/avi|max:512000'
             ]);
         }
         else if($request->type == 'audio')
         {
             $request->validate([
-                'file' => 'required|mimes:application/octet-stream,audio/mpeg,mpga,mp3,wav'
+                'file' => 'required|mimes:application/octet-stream,audio/mpeg,mpga,mp3,wav|max:307200'
             ]);
         }
         else
         {
             $request->validate([
-                'file' => 'required|mimes:pdf'
+                'file' => 'required|mimes:pdf|max:204800'
             ]);
         }   
 
@@ -223,6 +223,16 @@ class ChapterController extends Controller
         $new->link = $path;
         $new->type = $type;
         $new->save();
+
+        // Always return JSON for AJAX requests
+        if($request->ajax() || $request->wantsJson())
+        {
+            return response()->json([
+                'success' => true,
+                'message' => 'Chapter format added successfully',
+                'redirect' => url('chapters/format/all?format='.$request->type)
+            ], 200, ['Content-Type' => 'application/json; charset=utf-8']);
+        }
 
         return redirect('chapters/format/all?format='.$request->type)->with('success','Chapter format added successfully');
     }
@@ -248,19 +258,19 @@ class ChapterController extends Controller
         if($request->type == 1)
         {
             $request->validate([
-                'file' => 'nullable|mimetypes:video/x-ms-asf,video/x-flv,video/mp4,application/x-mpegURL,video/MP2T,video/3gpp,video/quicktime,video/x-msvideo,video/x-ms-wmv,video/avi'
+                'file' => 'nullable|mimetypes:video/x-ms-asf,video/x-flv,video/mp4,application/x-mpegURL,video/MP2T,video/3gpp,video/quicktime,video/x-msvideo,video/x-ms-wmv,video/avi|max:512000'
             ]);
         }
         else if($request->type == 0)
         {
             $request->validate([
-                'file' => 'nullable|mimes:application/octet-stream,audio/mpeg,mpga,mp3,wav'
+                'file' => 'nullable|mimes:application/octet-stream,audio/mpeg,mpga,mp3,wav|max:307200'
             ]);
         }
         else
         {
             $request->validate([
-                'file' => 'nullable|mimes:pdf'
+                'file' => 'nullable|mimes:pdf|max:204800'
             ]);
         }  
 
@@ -288,6 +298,16 @@ class ChapterController extends Controller
                 $type = 'video';
             else
                 $type = 'pdf';
+
+            // Return JSON for AJAX requests
+            if($request->ajax() || $request->wantsJson())
+            {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Chapter format details updated successfully',
+                    'redirect' => url('chapters/format/all?format='.$type)
+                ], 200, ['Content-Type' => 'application/json; charset=utf-8']);
+            }
 
             return redirect('chapters/format/all?format='.$type)->with('success','Chapter format details updated successfully');
         } 
