@@ -96,7 +96,7 @@
 </ul>
 </li>
 
-<li class="{{ request()->is('mcq-questions/*') ? 'mm-active' : '' }}">
+<li class="d-none {{ request()->is('mcq-questions/*') ? 'mm-active' : '' }}">
     <a class="has-arrow {{ request()->is('mcq-questions/*') ? 'mm-active' : '' }}" href="javascript:void(0);" aria-expanded="{{ request()->is('mcq-questions/*') ? 'true' : 'false' }}">
         <i class="material-icons">quiz</i>
         <span class="nav-text">MCQ Questions</span>

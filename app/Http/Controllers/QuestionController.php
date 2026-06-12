@@ -16,6 +16,7 @@ class QuestionController extends Controller
     protected  $QuestionService;
     public function __construct()
     {
+        abort(404);
         $this->QuestionService = new QuestionService();
     }
     
