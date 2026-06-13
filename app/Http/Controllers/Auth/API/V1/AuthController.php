@@ -101,7 +101,11 @@ class AuthController extends Controller
 			'status' => true,
 			'message' => 'Login successfully',
 			'token' => $token,
-			'student_details' => Auth::user()
+			'student_details' => Auth::user()->leftjoin('standards', 'users.standard', '=', 'standards.id')
+										->leftjoin('media', 'users.medium', '=', 'media.id')
+										->select('users.*', 'standards.name as standard_name', 'media.name as medium_name')
+										->where('users.id', Auth::user()->id)
+										->first()
 		]);
 	}
 	public function getStandardData(Request $request)

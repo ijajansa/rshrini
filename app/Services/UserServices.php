@@ -40,6 +40,8 @@ class UserServices
     	$record->amount = $data['amount'] ?? null;
     	$record->refer_code = bin2hex(random_bytes(3));
     	$record->profile_photo = $path ?? null;
+        $record->standard = $data['standard'] ?? null;
+        $record->medium = $data['medium'] ?? null;
     	$record->save();
 
     	return $record;
@@ -74,7 +76,7 @@ class UserServices
     
     public function fetch($id)
     {
-        $record = $this->UserModel->where('id',$id)->first();
+        $record = $this->UserModel->where('users.id',$id)->leftjoin('standards', 'users.standard', '=', 'standards.id')->leftjoin('media', 'users.medium', '=', 'media.id')->select('users.*', 'standards.name as standard_name', 'media.name as medium_name')->first();
         return $record;
     }
     

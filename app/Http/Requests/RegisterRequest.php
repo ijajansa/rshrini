@@ -35,7 +35,9 @@ class RegisterRequest extends FormRequest
             'gender' => 'required',
             'profile_photo' => 'required|mimes:png,jpg,jpeg',
             'payment_type' => 'required',
-            'amount' => 'required'
+            'amount' => 'required',
+            'standard' => 'required',
+            'medium' => 'required',
         ];
     }
 
