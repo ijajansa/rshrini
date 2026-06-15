@@ -9,6 +9,7 @@
 					<h5 class="mb-0">Personal Details</h5>
 				</div>
 				<div class="card-body">
+					
 					<form method="POST" action="{{url('students/add')}}"  enctype="multipart/form-data">
 						@csrf
 						<div class="row">
@@ -96,6 +97,37 @@
 
 							<div class="col-xl-6 col-sm-6">
 								<div class="mb-3">
+									<label class="form-label text-primary">Standard <span class="required">*</span></label>
+									<select id="standardSelect" name="standard" class="default-select form-control form-control-sm wide @error('standard') is-invalid @enderror">
+										<option value="">Select Standard</option>
+										@foreach($standards as $standard)
+											<option value="{{$standard->id}}" @if(old('standard') == $standard->id) selected @endif>{{$standard->name}}</option>
+										@endforeach
+									</select>
+									@error('standard')
+									<span class="invalid-feedback" role="alert">
+										<strong>{{ $message }}</strong>
+									</span>
+									@enderror
+								</div>
+							</div>
+
+							<div class="col-xl-6 col-sm-6">
+								<div class="mb-3">
+									<label class="form-label text-primary">Medium <span class="required">*</span></label>
+									<select id="mediumSelect" name="medium" class="default-select form-control form-control-sm wide @error('medium') is-invalid @enderror">
+										<option value="">Select Medium</option>
+									</select>
+									@error('medium')
+									<span class="invalid-feedback" role="alert">
+										<strong>{{ $message }}</strong>
+									</span>
+									@enderror
+								</div>
+							</div>
+
+							<div class="col-xl-6 col-sm-6">
+								<div class="mb-3">
 									<label class="form-label">Payment Type <span class="required">*</span></label>
 									<div class="dropdown bootstrap-select default-select form-control wide">
 										<select id="inputState" name="payment_type" class="default-select form-control form-control-sm wide @error('payment_type') is-invalid @enderror" tabindex="null">
@@ -123,6 +155,11 @@
 												<label for="imageUpload" class="dlab-upload mb-0 btn btn-primary btn-sm">Choose File</label>
 											</div>
 										</div>	
+										@error('profile_photo')
+										<span class="invalid-feedback" role="alert" style="display:block">
+											<strong>{{ $message }}</strong>
+										</span>
+										@enderror
 								</div>
 							</div>
 
@@ -151,6 +188,45 @@
 </div>
 
 <script type="text/javascript">
+	const mediumUrl = "{{ url('students/mediums') }}";
+	const selectedMedium = "{{ old('medium') }}";
+
+	function loadMediums(standardId, mediumId = '') {
+		const mediumSelect = document.getElementById('mediumSelect');
+		mediumSelect.innerHTML = '<option value="">Select Medium</option>';
+
+		if (!standardId) {
+			refreshMediumSelect();
+			return;
+		}
+
+		fetch(`${mediumUrl}/${standardId}`)
+			.then(response => response.json())
+			.then(mediums => {
+				mediums.forEach(medium => {
+					const option = document.createElement('option');
+					option.value = medium.id;
+					option.textContent = medium.name;
+					option.selected = String(medium.id) === String(mediumId);
+					mediumSelect.appendChild(option);
+				});
+
+				refreshMediumSelect();
+			});
+	}
+
+	function refreshMediumSelect() {
+		if (window.jQuery && jQuery.fn.selectpicker) {
+			jQuery('#mediumSelect').selectpicker('refresh');
+		}
+	}
+
+	document.getElementById('standardSelect').addEventListener('change', function () {
+		loadMediums(this.value);
+	});
+
+	loadMediums(document.getElementById('standardSelect').value, selectedMedium);
+
     function showImagePreview(event) {
         var element = document.getElementById("imageUpload");
         var output2 = document.getElementById('output');

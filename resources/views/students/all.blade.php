@@ -22,6 +22,42 @@
 						</p>
 					</div>
 				</div>
+				<div class="card-body pb-0">
+					<div class="row">
+						<div class="col-xl-3 col-sm-6 mb-3">
+							<label>Standard</label>
+							<select class="form-control form-control-sm" id="standard_filter" onchange="onStandardFilterChange()">
+								<option value="">Select Standard</option>
+								@foreach($standards as $standard)
+									<option value="{{$standard->id}}">{{$standard->name}}</option>
+								@endforeach
+							</select>
+						</div>
+						<div class="col-xl-3 col-sm-6 mb-3">
+							<label>Medium</label>
+							<select class="form-control form-control-sm" id="medium_filter" onchange="ajaxRefresh()">
+								<option value="">Select Medium</option>
+							</select>
+						</div>
+						<div class="col-xl-3 col-sm-6 mb-3">
+							<label>Student Status</label>
+							<select class="form-control form-control-sm" id="status_filter" onchange="ajaxRefresh()">
+								<option value="">Select Status</option>
+								<option value="1">Active</option>
+								<option value="0">Inactive</option>
+							</select>
+						</div>
+						<div class="col-xl-3 col-sm-6 mb-3">
+							<label>Payment Type</label>
+							<select class="form-control form-control-sm" id="payment_type_filter" onchange="ajaxRefresh()">
+								<option value="">Select Payment Type</option>
+								<option value="google_pay">Google Pay</option>
+								<option value="phone_pay">Phone Pay</option>
+								<option value="cash">Cash</option>
+							</select>
+						</div>
+					</div>
+				</div>
 				<!-- /tab-content -->	
 				<div class="tab-content" id="myTabContent-3">
 					<div class="tab-pane fade show active" id="withoutBorder" role="tabpanel" aria-labelledby="home-tab-3">
@@ -36,6 +72,8 @@
 											<th>Contact Number</th>
 											<th>Parent Contact Number</th>
 											<th>Email ID</th>
+											<th>Standard</th>
+											<th>Medium</th>
 											<th>Status</th>
 											<th>Action</th>
 										</tr>
@@ -65,6 +103,10 @@
 	function datatable()
 	{
 		search = $("#search").val();
+		standard = $("#standard_filter").val();
+		medium = $("#medium_filter").val();
+		status = $("#status_filter").val();
+		payment_type = $("#payment_type_filter").val();
 		var table = $('#myTable').DataTable({
 			"searching":false,
 			"lengthChange":false,
@@ -77,7 +119,7 @@
 					previous: '<i class="fa-solid fa-angle-left"></i>' 
 				}
 			},
-			"ajax":"{{url('students/all')}}?student="+search,
+			"ajax":"{{url('students/all')}}?student="+search+"&standard="+standard+"&medium="+medium+"&status="+status+"&payment_type="+payment_type,
 			"columns":[
 			{
 				"mData": "id",
@@ -100,6 +142,20 @@
 			{
 				"mData": "email",
 				"bSortable": false,
+			},
+			{
+				"mData": "standard_name",
+				"bSortable": false,
+				"mRender": function (data, type, row) {
+					return data ? data : '-';
+				}
+			},
+			{
+				"mData": "medium_name",
+				"bSortable": false,
+				"mRender": function (data, type, row) {
+					return data ? data : '-';
+				}
 			},
 			{
 				"targets": -1,
@@ -132,6 +188,36 @@
 	function ajaxRefresh(val){
 		$('#myTable').DataTable().destroy().clear();
 		datatable();
+	}
+
+	function onStandardFilterChange() {
+		loadMediumFilter($("#standard_filter").val());
+	}
+
+	function loadMediumFilter(standardId) {
+		var mediumSelect = $("#medium_filter");
+		mediumSelect.html('<option value="">Select Medium</option>');
+
+		if (!standardId) {
+			refreshMediumFilter();
+			ajaxRefresh();
+			return;
+		}
+
+		$.get("{{url('students/mediums')}}/" + standardId, function (mediums) {
+			mediums.forEach(function (medium) {
+				mediumSelect.append('<option value="' + medium.id + '">' + medium.name + '</option>');
+			});
+
+			refreshMediumFilter();
+			ajaxRefresh();
+		});
+	}
+
+	function refreshMediumFilter() {
+		if ($.fn.selectpicker) {
+			$("#medium_filter").selectpicker('refresh');
+		}
 	}
 	
 	function changeStatus(id)

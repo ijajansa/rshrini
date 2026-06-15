@@ -42,6 +42,7 @@ Route::group(['prefix' => 'users', 'middleware'=> ['auth']], function(){
 Route::group(['prefix' => 'students', 'middleware'=> ['auth','prevent-back-history']], function(){
 	Route::get('all',[StudentController::class, 'getAllStudents']);
 	Route::get('add',[StudentController::class, 'getAddStudent']);
+	Route::get('mediums/{standard}',[StudentController::class, 'getMediumsByStandard']);
 	Route::get('delete/{id}',[StudentController::class, 'deleteStudent']);
 	Route::post('add',[StudentController::class, 'addStudent']);
 	Route::get('edit/{id}',[StudentController::class, 'editStudentPage']);

@@ -68,6 +68,8 @@ class UserServices
     	    $record->payment_type = $data['payment_type'] ?? $record->payment_type;
     	    $record->parent_contact_number = $data['parent_contact_number'];
     	    $record->amount = $data['amount'] ?? $record->amount;
+            $record->standard = $data['standard'] ?? $record->standard;
+            $record->medium = $data['medium'] ?? $record->medium;
     	    $record->save();
     	    return $record;
         }
