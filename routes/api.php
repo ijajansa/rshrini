@@ -14,13 +14,13 @@ use App\Http\Controllers\Auth\API\V1\AuthController;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
-
+Route::post('standards', [AuthController::class, 'getStandardData']);
+Route::post('mediums', [AuthController::class, 'getMediumData']);
+	
 Route::post('login', [AuthController::class, 'login']);
 Route::post('register', [AuthController::class, 'register']);
 Route::group(['middleware' => ['jwt.verify']], function(){
 	Route::post('dashboard', [AuthController::class, 'dashboard']);
-	Route::post('standards', [AuthController::class, 'getStandardData']);
-	Route::post('mediums', [AuthController::class, 'getMediumData']);
 	Route::post('subjects', [AuthController::class, 'getSubjectData']);
 	Route::get('pdf-types', [AuthController::class, 'getChapterTypeData']);
 	Route::post('chapters', [AuthController::class, 'getChapterData']);
